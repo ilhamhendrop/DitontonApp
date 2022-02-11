@@ -10,14 +10,14 @@ abstract class TvLocalDataSource {
 }
 
 class TvLocalDataSourceImpl implements TvLocalDataSource {
-  final DatabaseHelperTv databaseHelperTv;
+  final DatabaseHelperTv databaseHelper;
 
-  TvLocalDataSourceImpl({required this.databaseHelperTv});
+  TvLocalDataSourceImpl({required this.databaseHelper});
 
   @override
   Future<String> insertWatchlistTv(TvTable tv) async {
     try {
-      await databaseHelperTv.insertWatchlistTv(tv);
+      await databaseHelper.insertWatchlistTv(tv);
       return 'Added to Watchlist';
     } catch (e) {
       throw DatabaseException(e.toString());
@@ -27,7 +27,7 @@ class TvLocalDataSourceImpl implements TvLocalDataSource {
   @override
   Future<String> removeWatchlistTv(TvTable tv) async {
     try {
-      await databaseHelperTv.removeWatchlistTv(tv);
+      await databaseHelper.removeWatchlistTv(tv);
       return 'Removed from Watchlist';
     } catch (e) {
       throw DatabaseException(e.toString());
@@ -36,7 +36,7 @@ class TvLocalDataSourceImpl implements TvLocalDataSource {
 
   @override
   Future<TvTable?> getTvById(int id) async {
-    final result = await databaseHelperTv.getTvById(id);
+    final result = await databaseHelper.getTvById(id);
     if (result != null) {
       return TvTable.fromMap(result);
     } else {
@@ -46,7 +46,7 @@ class TvLocalDataSourceImpl implements TvLocalDataSource {
 
   @override
   Future<List<TvTable>> getWatchlistTv() async {
-    final result = await databaseHelperTv.getWatchlistTv();
+    final result = await databaseHelper.getWatchlistTv();
     return result.map((data) => TvTable.fromMap(data)).toList();
   }
 }

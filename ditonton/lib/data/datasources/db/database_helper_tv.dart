@@ -1,14 +1,15 @@
 import 'dart:async';
+import 'package:ditonton/data/models/movie_table.dart';
 import 'package:ditonton/data/models/tv_table.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DatabaseHelperTv {
-  static DatabaseHelperTv? _databaseHelperTv;
+  static DatabaseHelperTv? _databaseHelper;
   DatabaseHelperTv._instance() {
-    _databaseHelperTv = this;
+    _databaseHelper = this;
   }
 
-  factory DatabaseHelperTv() => _databaseHelperTv ?? DatabaseHelperTv._instance();
+  factory DatabaseHelperTv() => _databaseHelper ?? DatabaseHelperTv._instance();
 
   static Database? _database;
 
@@ -17,11 +18,11 @@ class DatabaseHelperTv {
     return _database;
   }
 
-  static const String _tblWatchlist = 'tv';
+  static const String _tblWatchlist = 'watchlist';
 
   Future<Database> _initDb() async {
     final path = await getDatabasesPath();
-    final databasePath = '$path/ditonton.db';
+    final databasePath = '$path/ditontontv.db';
 
     var db = await openDatabase(databasePath, version: 1, onCreate: _onCreate);
     return db;
@@ -37,6 +38,7 @@ class DatabaseHelperTv {
       );
     ''');
   }
+
 
   Future<int> insertWatchlistTv(TvTable tv) async {
     final db = await database;
@@ -73,4 +75,5 @@ class DatabaseHelperTv {
 
     return results;
   }
+
 }
