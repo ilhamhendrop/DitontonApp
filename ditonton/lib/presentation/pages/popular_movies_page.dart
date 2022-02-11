@@ -1,34 +1,34 @@
 import 'package:ditonton/common/state_enum.dart';
-import 'package:ditonton/presentation/provider/top_rated_tv_notifier.dart';
-import 'package:ditonton/presentation/widgets/tv_card_list.dart';
+import 'package:ditonton/presentation/provider/popular_movies_notifier.dart';
+import 'package:ditonton/presentation/widgets/movie_card_list.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class TopRatedTvPage extends StatefulWidget {
-  static const ROUTE_NAME = '/top-rated-tv';
+class PopularMoviesPage extends StatefulWidget {
+  static const ROUTE_NAME = '/popular-movie';
 
   @override
-  _TopRatedTvPageState createState() => _TopRatedTvPageState();
+  _PopularMoviesPageState createState() => _PopularMoviesPageState();
 }
 
-class _TopRatedTvPageState extends State<TopRatedTvPage> {
+class _PopularMoviesPageState extends State<PopularMoviesPage> {
   @override
   void initState() {
     super.initState();
     Future.microtask(() =>
-        Provider.of<TopRatedTvNotifier>(context, listen: false)
-            .fetchTopRatedTv());
+        Provider.of<PopularMoviesNotifier>(context, listen: false)
+            .fetchPopularMovies());
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Top Rated TV'),
+        title: Text('Popular Movies'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Consumer<TopRatedTvNotifier>(
+        child: Consumer<PopularMoviesNotifier>(
           builder: (context, data, child) {
             if (data.state == RequestState.Loading) {
               return Center(
@@ -37,10 +37,10 @@ class _TopRatedTvPageState extends State<TopRatedTvPage> {
             } else if (data.state == RequestState.Loaded) {
               return ListView.builder(
                 itemBuilder: (context, index) {
-                  final tv = data.tv[index];
-                  return TvCard(tv);
+                  final movie = data.movies[index];
+                  return MovieCard(movie);
                 },
-                itemCount: data.tv.length,
+                itemCount: data.movies.length,
               );
             } else {
               return Center(

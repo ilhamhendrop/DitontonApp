@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class PopularTvPage extends StatefulWidget {
-  static const ROUTE_NAME = '/popular-movie';
+  static const ROUTE_NAME = '/popular-tv';
 
   @override
   _PopularTvPageState createState() => _PopularTvPageState();
@@ -24,7 +24,7 @@ class _PopularTvPageState extends State<PopularTvPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Popular Movies'),
+        title: Text('Popular TV'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),

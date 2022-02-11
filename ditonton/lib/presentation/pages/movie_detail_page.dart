@@ -1,33 +1,33 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:ditonton/common/constants.dart';
 import 'package:ditonton/domain/entities/genre.dart';
-import 'package:ditonton/domain/entities/tv.dart';
-import 'package:ditonton/domain/entities/tv_detail.dart';
-import 'package:ditonton/presentation/provider/tv_detail_notifier.dart';
+import 'package:ditonton/domain/entities/movie.dart';
+import 'package:ditonton/domain/entities/movie_detail.dart';
+import 'package:ditonton/presentation/provider/movie_detail_notifier.dart';
 import 'package:ditonton/common/state_enum.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:provider/provider.dart';
 
-class TvDetailPage extends StatefulWidget {
-  static const ROUTE_NAME = '/detailTv';
+class MovieDetailPage extends StatefulWidget {
+  static const ROUTE_NAME = '/detail';
 
   final int id;
-  TvDetailPage({required this.id});
+  MovieDetailPage({required this.id});
 
   @override
-  _TvDetailPageState createState() => _TvDetailPageState();
+  _MovieDetailPageState createState() => _MovieDetailPageState();
 }
 
-class _TvDetailPageState extends State<TvDetailPage> {
+class _MovieDetailPageState extends State<MovieDetailPage> {
   @override
   void initState() {
     super.initState();
     Future.microtask(() {
-      Provider.of<TvDetailNotifier>(context, listen: false)
-          .fetchTvDetail(widget.id);
-      Provider.of<TvDetailNotifier>(context, listen: false)
+      Provider.of<MovieDetailNotifier>(context, listen: false)
+          .fetchMovieDetail(widget.id);
+      Provider.of<MovieDetailNotifier>(context, listen: false)
           .loadWatchlistStatus(widget.id);
     });
   }
@@ -35,18 +35,18 @@ class _TvDetailPageState extends State<TvDetailPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Consumer<TvDetailNotifier>(
+      body: Consumer<MovieDetailNotifier>(
         builder: (context, provider, child) {
           if (provider.movieState == RequestState.Loading) {
             return Center(
               child: CircularProgressIndicator(),
             );
           } else if (provider.movieState == RequestState.Loaded) {
-            final tv = provider.tv;
+            final movie = provider.movie;
             return SafeArea(
               child: DetailContent(
-                tv,
-                provider.tvRecommendations,
+                movie,
+                provider.movieRecommendations,
                 provider.isAddedToWatchlist,
               ),
             );
@@ -60,11 +60,11 @@ class _TvDetailPageState extends State<TvDetailPage> {
 }
 
 class DetailContent extends StatelessWidget {
-  final TvDetail tv;
-  final List<Tv> recommendations;
+  final MovieDetail movie;
+  final List<Movie> recommendations;
   final bool isAddedWatchlist;
 
-  DetailContent(this.tv, this.recommendations, this.isAddedWatchlist);
+  DetailContent(this.movie, this.recommendations, this.isAddedWatchlist);
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +72,7 @@ class DetailContent extends StatelessWidget {
     return Stack(
       children: [
         CachedNetworkImage(
-          imageUrl: 'https://image.tmdb.org/t/p/w500${tv.posterPath}',
+          imageUrl: 'https://image.tmdb.org/t/p/w500${movie.posterPath}',
           width: screenWidth,
           placeholder: (context, url) => Center(
             child: CircularProgressIndicator(),
@@ -103,33 +103,33 @@ class DetailContent extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              tv.name,
+                              movie.title,
                               style: kHeading5,
                             ),
                             ElevatedButton(
                               onPressed: () async {
                                 if (!isAddedWatchlist) {
-                                  await Provider.of<TvDetailNotifier>(
+                                  await Provider.of<MovieDetailNotifier>(
                                           context,
                                           listen: false)
-                                      .addWatchlist(tv);
+                                      .addWatchlist(movie);
                                 } else {
-                                  await Provider.of<TvDetailNotifier>(
+                                  await Provider.of<MovieDetailNotifier>(
                                           context,
                                           listen: false)
-                                      .removeFromWatchlist(tv);
+                                      .removeFromWatchlist(movie);
                                 }
 
                                 final message =
-                                    Provider.of<TvDetailNotifier>(context,
+                                    Provider.of<MovieDetailNotifier>(context,
                                             listen: false)
                                         .watchlistMessage;
 
                                 if (message ==
-                                        TvDetailNotifier
+                                        MovieDetailNotifier
                                             .watchlistAddSuccessMessage ||
                                     message ==
-                                        TvDetailNotifier
+                                        MovieDetailNotifier
                                             .watchlistRemoveSuccessMessage) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(content: Text(message)));
@@ -153,31 +153,16 @@ class DetailContent extends StatelessWidget {
                                 ],
                               ),
                             ),
-                            Row(
-                              children: [
-                                Text("Language : "),
-                                Text(tv.originalLanguage),
-                              ],
+                            Text(
+                              _showGenres(movie.genres),
                             ),
                             Text(
-                              tv.firstAirDate.toString(),
-                            ),
-                            Row(
-                              children: [
-                                Text("Season : "),
-                                Text(tv.numberOfSeasons.toString()),
-                              ],
-                            ),
-                            Row(
-                              children: [
-                                Text("Episode : "),
-                                Text(tv.numberOfEpisodes.toString()),
-                              ],
+                              _showDuration(movie.runtime),
                             ),
                             Row(
                               children: [
                                 RatingBarIndicator(
-                                  rating: tv.voteAverage / 2,
+                                  rating: movie.voteAverage / 2,
                                   itemCount: 5,
                                   itemBuilder: (context, index) => Icon(
                                     Icons.star,
@@ -185,7 +170,7 @@ class DetailContent extends StatelessWidget {
                                   ),
                                   itemSize: 24,
                                 ),
-                                Text('${tv.voteAverage}')
+                                Text('${movie.voteAverage}')
                               ],
                             ),
                             SizedBox(height: 16),
@@ -194,14 +179,14 @@ class DetailContent extends StatelessWidget {
                               style: kHeading6,
                             ),
                             Text(
-                              tv.overview,
+                              movie.overview,
                             ),
                             SizedBox(height: 16),
                             Text(
                               'Recommendations',
                               style: kHeading6,
                             ),
-                            Consumer<TvDetailNotifier>(
+                            Consumer<MovieDetailNotifier>(
                               builder: (context, data, child) {
                                 if (data.recommendationState ==
                                     RequestState.Loading) {
@@ -225,7 +210,7 @@ class DetailContent extends StatelessWidget {
                                             onTap: () {
                                               Navigator.pushReplacementNamed(
                                                 context,
-                                                TvDetailPage.ROUTE_NAME,
+                                                MovieDetailPage.ROUTE_NAME,
                                                 arguments: movie.id,
                                               );
                                             },
@@ -308,4 +293,14 @@ class DetailContent extends StatelessWidget {
     return result.substring(0, result.length - 2);
   }
 
+  String _showDuration(int runtime) {
+    final int hours = runtime ~/ 60;
+    final int minutes = runtime % 60;
+
+    if (hours > 0) {
+      return '${hours}h ${minutes}m';
+    } else {
+      return '${minutes}m';
+    }
+  }
 }
