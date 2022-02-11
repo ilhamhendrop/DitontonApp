@@ -1,23 +1,23 @@
 import 'package:ditonton/common/state_enum.dart';
-import 'package:ditonton/presentation/provider/popular_movies_notifier.dart';
-import 'package:ditonton/presentation/widgets/movie_card_list.dart';
+import 'package:ditonton/presentation/provider/popular_tv_notifier.dart';
+import 'package:ditonton/presentation/widgets/tv_card_list.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class PopularMoviesPage extends StatefulWidget {
+class PopularTvPage extends StatefulWidget {
   static const ROUTE_NAME = '/popular-movie';
 
   @override
-  _PopularMoviesPageState createState() => _PopularMoviesPageState();
+  _PopularTvPageState createState() => _PopularTvPageState();
 }
 
-class _PopularMoviesPageState extends State<PopularMoviesPage> {
+class _PopularTvPageState extends State<PopularTvPage> {
   @override
   void initState() {
     super.initState();
     Future.microtask(() =>
-        Provider.of<PopularMoviesNotifier>(context, listen: false)
-            .fetchPopularMovies());
+        Provider.of<PopularTvNotifier>(context, listen: false)
+            .fetchPopularTv());
   }
 
   @override
@@ -28,7 +28,7 @@ class _PopularMoviesPageState extends State<PopularMoviesPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Consumer<PopularMoviesNotifier>(
+        child: Consumer<PopularTvNotifier>(
           builder: (context, data, child) {
             if (data.state == RequestState.Loading) {
               return Center(
@@ -37,10 +37,10 @@ class _PopularMoviesPageState extends State<PopularMoviesPage> {
             } else if (data.state == RequestState.Loaded) {
               return ListView.builder(
                 itemBuilder: (context, index) {
-                  final movie = data.movies[index];
-                  return MovieCard(movie);
+                  final tv = data.tv[index];
+                  return TvCard(tv);
                 },
-                itemCount: data.movies.length,
+                itemCount: data.tv.length,
               );
             } else {
               return Center(
